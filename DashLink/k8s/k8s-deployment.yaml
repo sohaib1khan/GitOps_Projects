@@ -4,7 +4,7 @@ metadata:
   name: dashlink-deployment
   namespace: test-gitops  # Ensure you're in the right namespace
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: dashlink
@@ -17,7 +17,7 @@ spec:
       - name: dashlink
         image: sohaib.hub/gitops_demo:1
         ports:
-        - containerPort: 5021
+        - containerPort: 5027
         volumeMounts:
         - name: dashlink-data
           mountPath: /app/data

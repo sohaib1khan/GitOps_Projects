@@ -7,7 +7,7 @@ spec:
   selector:
     app: dashlink
   ports:
-  - port: 5021 # Internal port of your app
-    targetPort: 5021
+  - port: 5027 # Internal port of your app
+    targetPort: 5027
     protocol: TCP
 
