@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir flask
 
 # Expose the application's port
-EXPOSE 5021
+EXPOSE 5027
 
 # Start the application using python
 CMD ["python", "app.py"]

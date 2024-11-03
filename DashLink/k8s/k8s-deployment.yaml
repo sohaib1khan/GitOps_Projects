@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: dashlink
-        image: sohaib.hub/gitops_demo:34
+        image: sohaib.hub/gitops_demo:1
         ports:
         - containerPort: 5027
         volumeMounts:
@@ -28,10 +28,10 @@ spec:
           limits:
             cpu: "500m"
             memory: "512Mi"
-      # volumes:
-      # - name: dashlink-data
-      #   hostPath:
-      #     path: /home/devk3s/dashlink
-      #     type: Directory
+      volumes:
+      - name: dashlink-data
+        hostPath:
+          path: /home/k8server/gitops
+          type: Directory
       imagePullSecrets:
       - name: regcred  # Ensure the secret exists in the dashlink namespace
