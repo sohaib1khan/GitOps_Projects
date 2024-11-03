@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: dashlink
-        image: registry.helixx.cloud/dashlink:latest  # Ensure an image tag is provided
+        image: sohaib.hub/gitops_demo:1
         ports:
         - containerPort: 5021
         volumeMounts:
