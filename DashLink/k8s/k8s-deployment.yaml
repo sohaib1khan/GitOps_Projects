@@ -4,7 +4,7 @@ metadata:
   name: dashlink-deployment
   namespace: test-gitops  # Ensure you're in the right namespace
 spec:
-  replicas: 1
+  replicas: 6
   selector:
     matchLabels:
       app: dashlink
