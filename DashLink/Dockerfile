@@ -16,4 +16,3 @@ EXPOSE 5027
 # Start the application using python
 CMD ["python", "app.py"]
 
-# WIll delete later 
