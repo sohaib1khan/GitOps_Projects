@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: dashlink
-        image: sohaib.hub/gitops_demo:9
+        image: sohaib.hub/gitops_demo:10
         ports:
         - containerPort: 5027
         volumeMounts:
