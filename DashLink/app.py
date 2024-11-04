@@ -81,4 +81,4 @@ def edit_bookmark():
 
 # Main entry point of the application
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5027)  # Run the Flask application in debug mode on port 
+    app.run(debug=True, host='0.0.0.0', port=5027)  # Run the Flask application in debug mode on port. 
