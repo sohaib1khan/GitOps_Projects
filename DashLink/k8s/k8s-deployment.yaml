@@ -15,11 +15,7 @@ spec:
     spec:
       containers:
       - name: dashlink
-<<<<<<< HEAD
-        image: sohaib.hub/gitops_demo:20
-=======
         image: registry.helixx.cloud/sohaib.hub/gitops_demo:latest
->>>>>>> 3fac806 ( :))
         ports:
         - containerPort: 5027
         volumeMounts:
