@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quiz-container">
+    <h2>AWS Developer Associate Quiz</h2>
+
+    <!-- Progress Section -->
+    <div class="progress-section">
+        <h3>Quiz Progress</h3>
+        <div class="quiz-progress-info">
+            <span class="question-counter">Question {{ quiz_info.current_number }} of {{ quiz_info.total_questions }}</span>
+            <span class="progress-percentage">{{ "%.0f"|format(quiz_info.progress_percentage) }}% Complete</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: {{ quiz_info.progress_percentage }}%"></div>
+        </div>
+    </div>
+
+    <!-- Single Question Display -->
+    <div class="question-card" id="question-{{ question.id }}"
+         data-question-id="{{ question.id }}"
+         data-completed="{{ question.completed|lower }}"
+         data-user-correct="{{ question.user_correct|lower }}"
+         data-question-type="{{ question.get('question_type', 'single') }}">
+
+        <div class="question-header">
+            <h3>Question {{ quiz_info.current_number }}</h3>
+            <div class="question-type-badge">
+                {% if question.get('question_type', 'single') == 'multiple' %}
+                    <span class="badge multiple">Multiple Choice</span>
+                {% else %}
+                    <span class="badge single">Single Choice</span>
+                {% endif %}
+            </div>
+            {% if question.completed %}
+                <div class="completion-indicator {{ 'correct' if question.user_correct else 'incorrect' }}">
+                    {% if question.user_correct %}
+                        ✓ Previously Answered Correctly
+                    {% else %}
+                        ✗ Previously Answered Incorrectly
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="question-text">{{ question.question_html|safe }}</div>
+
+        <!-- Instructions based on question type -->
+        <div class="question-instructions">
+            {% if question.get('question_type', 'single') == 'multiple' %}
+                <p class="instruction-text">💡 <strong>Select all answers that apply.</strong> This question may have multiple correct answers.</p>
+            {% else %}
+                <p class="instruction-text">💡 <strong>Select the best answer.</strong> Choose only one option.</p>
+            {% endif %}
+        </div>
+
+        <form action="{{ url_for('check_answer') }}" method="post" class="answer-form">
+            <input type="hidden" name="question_id" value="{{ question.id }}">
+            <input type="hidden" name="question_type" value="{{ question.get('question_type', 'single') }}">
+
+            <div class="options">
+                {% if question.get('question_type', 'single') == 'multiple' %}
+                    {# Multiple Choice - Checkboxes #}
+                    {% for option in question.options %}
+                    <div class="option">
+                        <input type="checkbox" name="answer" id="q{{ question.id }}-option{{ loop.index }}" value="{{ option }}">
+                        <label for="q{{ question.id }}-option{{ loop.index }}">{{ option }}</label>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    {# Single Choice - Radio Buttons #}
+                    {% for option in question.options %}
+                    <div class="option">
+                        <input type="radio" name="answer" id="q{{ question.id }}-option{{ loop.index }}" value="{{ option }}" required>
+                        <label for="q{{ question.id }}-option{{ loop.index }}">{{ option }}</label>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="quiz-navigation">
+                <button type="submit" class="button submit-answer">Submit Answer</button>
+
+                {% if quiz_info.current_number < quiz_info.total_questions %}
+                    <form action="{{ url_for('quiz_next') }}" method="post" style="display: inline;">
+                        <button type="submit" class="button secondary skip-question">Skip Question</button>
+                    </form>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Quiz Navigation Info -->
+    <div class="quiz-info">
+        <p>Answer this question and you'll automatically move to the next one.</p>
+        {% if quiz_info.current_number < quiz_info.total_questions %}
+            <p>You can also skip this question if you want to come back to it later.</p>
+        {% else %}
+            <p><strong>This is the last question!</strong> Complete it to see your results.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Quiz-specific styles for single question mode */
+.quiz-progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.question-counter {
+    color: var(--text-color);
+}
+
+.progress-percentage {
+    color: #ff9900;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.question-type-badge {
+    display: flex;
+    align-items: center;
+}
+
+.badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge.single {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.badge.multiple {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+[data-theme="dark"] .badge.single {
+    background-color: #1a237e;
+    color: #90caf9;
+}
+
+[data-theme="dark"] .badge.multiple {
+    background-color: #4a148c;
+    color: #ce93d8;
+}
+
+.completion-indicator {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+}
+
+.completion-indicator.correct {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.completion-indicator.incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+[data-theme="dark"] .completion-indicator.correct {
+    background-color: #1e4d2b;
+    color: #4caf50;
+}
+
+[data-theme="dark"] .completion-indicator.incorrect {
+    background-color: #4d1e1e;
+    color: #f44336;
+}
+
+.question-instructions {
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: var(--progress-bg);
+    border-radius: 8px;
+    border-left: 4px solid #ff9900;
+}
+
+.instruction-text {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.quiz-navigation {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.submit-answer {
+    background-color: #ff9900;
+}
+
+.skip-question {
+    background-color: #6c757d;
+}
+
+.quiz-info {
+    background-color: var(--progress-bg);
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.quiz-info p {
+    margin-bottom: 5px;
+    color: var(--footer-color);
+}
+
+.quiz-info p:last-child {
+    margin-bottom: 0;
+}
+
+/* Enhanced question card for single question */
+.question-card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.question-card:hover {
+    border-color: #ff9900;
+    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.1);
+}
+
+.question-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.options {
+    margin-bottom: 25px;
+}
+
+.option {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.option:hover {
+    background-color: var(--progress-bg);
+}
+
+.option input[type="radio"],
+.option input[type="checkbox"] {
+    margin-right: 20px;
+}
+
+.option label {
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+/* Special styling for multiple choice */
+.question-card[data-question-type="multiple"] .option {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.question-card[data-question-type="multiple"] .option:hover {
+    border-left-color: #ff9900;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .quiz-progress-info {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .quiz-navigation {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .quiz-navigation .button {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle form submission for single question
+    const answerForm = document.querySelector('.answer-form');
+    if (answerForm) {
+        answerForm.addEventListener('submit', function(e) {
+            const questionId = this.querySelector('input[name="question_id"]').value;
+            const questionType = this.querySelector('input[name="question_type"]').value;
+
+            if (questionType === 'multiple') {
+                // Multiple choice - check if at least one checkbox is selected
+                const selectedAnswers = this.querySelectorAll('input[name="answer"]:checked');
+                if (selectedAnswers.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one answer before submitting.');
+                    return;
+                }
+
+                // Store selected answers
+                const answerValues = Array.from(selectedAnswers).map(input => input.value);
+                sessionStorage.setItem('last_submitted_question', questionId);
+                sessionStorage.setItem('last_selected_answers', JSON.stringify(answerValues));
+            } else {
+                // Single choice - check if radio button is selected
+                const selectedAnswer = this.querySelector('input[name="answer"]:checked');
+                if (!selectedAnswer) {
+                    e.preventDefault();
+                    alert('Please select an answer before submitting.');
+                    return;
+                }
+
+                // Store selected answer
+                sessionStorage.setItem('last_submitted_question', questionId);
+                sessionStorage.setItem('last_selected_answer', selectedAnswer.value);
+            }
+        });
+    }
+
+    // Auto-focus on first input for keyboard navigation
+    const firstInput = document.querySelector('input[type="radio"], input[type="checkbox"]');
+    if (firstInput) {
+        firstInput.focus();
+    }
+});
+</script>
+{% endblock %}

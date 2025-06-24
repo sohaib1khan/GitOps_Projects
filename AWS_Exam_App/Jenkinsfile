@@ -1,0 +1,121 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('DOCKERHUB-CRED') // Using your credential ID
+        DOCKERHUB_REPO = 'CUSTOM_APP_IMAGE:latest' // Replace with your actual DockerHub repo
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        GIT_REPO = 'https://github.com/PROJECT_OWNER/AWS_Exam_App.git' // Replace with your actual GitHub repo
+        GITHUB_CREDENTIALS = credentials('GITHUB_CRED') // Your actual GitHub credential ID
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout with credentials for private repo
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: env.GIT_REPO,
+                        credentialsId: 'GITHUB_CRED'
+                    ]]
+                ])
+                script {
+                    // Get commit hash for tagging
+                    env.GIT_COMMIT_HASH = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                    echo "Building commit: ${env.GIT_COMMIT_HASH}"
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building Docker image: ${DOCKERHUB_REPO}:latest"
+                    // Always build with latest tag
+                    sh "docker build -t ${DOCKERHUB_REPO}:latest ."
+                }
+            }
+        }
+        
+        stage('Push to DockerHub') {
+            steps {
+                script {
+                    // Login and push using Jenkins credentials
+                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                    
+                    // Push only latest tag
+                    sh "docker push ${DOCKERHUB_REPO}:latest"
+                    
+                    echo "Successfully pushed: ${DOCKERHUB_REPO}:latest"
+                }
+            }
+        }
+        
+        stage('Trigger ArgoCD Deployment') {
+            steps {
+                script {
+                    // For now, let's SKIP the YAML modifications that are corrupting the file
+                    // ArgoCD can detect image changes and we'll use manual sync
+                    
+                    echo "✅ Image pushed as 'latest'"
+                    echo "📝 To trigger ArgoCD deployment:"
+                    echo "   1. Go to ArgoCD UI: http://192.168.1.xxx"
+                    echo "   2. Click 'Refresh' on aws-study-app"
+                    echo "   3. Click 'Sync' to deploy latest image"
+                    echo ""
+                    echo "🔄 Or manually restart deployment:"
+                    echo "   kubectl rollout restart deployment/aws-study-app -n aws-study-app"
+                }
+            }
+        }
+        
+        stage('Deploy to Kubernetes') {
+            when {
+                // Only run if explicitly requested
+                expression { params.DIRECT_DEPLOY == true }
+            }
+            steps {
+                script {
+                    try {
+                        echo "Direct deployment requested..."
+                        sh 'kubectl rollout restart deployment/aws-study-app -n aws-study-app'
+                        sh 'kubectl rollout status deployment/aws-study-app -n aws-study-app --timeout=300s'
+                        echo "✅ Direct deployment successful!"
+                    } catch (Exception e) {
+                        echo "⚠️  Direct deployment failed - ArgoCD will handle it"
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up Docker images to save space
+            sh """
+                docker rmi ${DOCKERHUB_REPO}:latest || true
+                docker system prune -f
+            """
+        }
+        success {
+            echo "✅ CI Pipeline completed successfully!"
+            echo "🚀 Image built and pushed: ${DOCKERHUB_REPO}:latest"
+            echo ""
+            echo "🔄 To deploy the new image:"
+            echo "   Option 1: ArgoCD UI - http://192.168.1.xxx → Refresh → Sync"
+            echo "   Option 2: Manual - kubectl rollout restart deployment/aws-study-app -n aws-study-app"
+            echo ""
+            echo "🌐 App will be available at: http://192.168.1.xxx"
+        }
+        failure {
+            echo "❌ Pipeline failed!"
+            echo "🔍 Check which stage failed above"
+            echo "💡 Common issues: Docker build, DockerHub push, or kubectl access"
+        }
+    }
+}

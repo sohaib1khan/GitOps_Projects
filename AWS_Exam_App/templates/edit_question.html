@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="edit-question-container">
+    <h2>Edit Question</h2>
+    
+    <form action="{{ url_for('edit_question', question_id=question.id) }}" method="post" class="question-form">
+        <div class="form-group">
+            <label for="question">Question: <span class="markdown-note">(Markdown supported)</span></label>
+            <div class="markdown-field">
+                <textarea name="question" id="question" required class="markdown-editor">{{ question.question }}</textarea>
+                <div class="markdown-preview-container">
+                    <div class="preview-header">Preview:</div>
+                    <div class="markdown-preview"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Answer Options:</label>
+            <div class="option-inputs">
+                <!-- Option 1 - Always required -->
+                <input type="text" name="option1" placeholder="Option 1" 
+                       value="{{ question.options[0] if question.options|length > 0 else '' }}" required>
+                
+                <!-- Option 2 - Always required -->
+                <input type="text" name="option2" placeholder="Option 2" 
+                       value="{{ question.options[1] if question.options|length > 1 else '' }}" required>
+                
+                <!-- Option 3 - Optional -->
+                <input type="text" name="option3" placeholder="Option 3" 
+                       value="{{ question.options[2] if question.options|length > 2 else '' }}">
+                
+                <!-- Option 4 - Optional -->
+                <input type="text" name="option4" placeholder="Option 4" 
+                       value="{{ question.options[3] if question.options|length > 3 else '' }}">
+                
+                <!-- Option 5 - Optional (NEW) -->
+                <input type="text" name="option5" placeholder="Option 5" 
+                       value="{{ question.options[4] if question.options|length > 4 else '' }}">
+                
+                <!-- Option 6 - Optional (NEW) -->
+                <input type="text" name="option6" placeholder="Option 6" 
+                       value="{{ question.options[5] if question.options|length > 5 else '' }}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="correct_answer">Correct Answer:</label>
+            <input type="text" name="correct_answer" id="correct_answer" value="{{ question.correct_answer }}" required>
+            <small>Enter the exact text of the correct option</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="explanation">Explanation: <span class="markdown-note">(Markdown supported)</span></label>
+            <div class="markdown-field">
+                <textarea name="explanation" id="explanation" required class="markdown-editor">{{ question.explanation }}</textarea>
+                <div class="markdown-preview-container">
+                    <div class="preview-header">Preview:</div>
+                    <div class="markdown-preview"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="button">Update Question</button>
+            <a href="{{ url_for('manage_questions') }}" class="button secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

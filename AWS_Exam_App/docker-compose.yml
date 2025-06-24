@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  aws-study-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5019:5019"
+    volumes:
+      # Persist data files between container restarts
+      - ./questions.json:/app/questions.json
+      - ./users.json:/app/users.json
+      - ./progress.json:/app/progress.json
+      - ./flashcards.json:/app/flashcards.json
+      - ./flashcard_progress.json:/app/flashcard_progress.json
+    restart: unless-stopped

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Cloud Certification Study Hub</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #ff9900;
+            --primary-dark: #e88e00;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-primary: #e2e8f0;
+            --error: #ef4444;
+            --error-bg: #fef2f2;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-primary: #334155;
+            --error-bg: #2d1b1b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .header-simple {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .header-simple h1 {
+            color: white;
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background-color: var(--bg-primary);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-xl);
+            padding: 4rem;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .login-logo {
+            font-size: 2.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .flash-message {
+            background-color: var(--error-bg);
+            color: var(--error);
+            border: 1px solid var(--error);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .login-form {
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.5rem;
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+            background-color: var(--bg-primary);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .features-list {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .features-list h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .footer-simple {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-simple p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .footer-simple a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .footer-simple a:hover {
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .header-simple h1 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-simple">
+        <h1>🚀 Cloud Certification Study Hub</h1>
+    </header>
+    
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">☁️</div>
+                <h2 class="login-title">Welcome Back!</h2>
+                <p class="login-subtitle">Sign in to continue your cloud certification journey</p>
+            </div>
+            
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">
+                            <span>❌</span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% endwith %}
+            
+            <form action="{{ url_for('login') }}" method="post" class="login-form">
+                <div class="form-group">
+                    <label for="username" class="form-label">👤 Username</label>
+                    <input type="text" name="username" id="username" class="form-input" required placeholder="Enter your username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">🔒 Password</label>
+                    <input type="password" name="password" id="password" class="form-input" required placeholder="Enter your password">
+                </div>
+                
+                <button type="submit" class="login-button">
+                    🚀 Sign In & Start Learning
+                </button>
+            </form>
+            
+            <div class="features-list">
+                <h4>✨ What's Inside</h4>
+                <div class="features">
+                    <div class="feature-item">
+                        <span>🎯</span>
+                        <span>Practice Quizzes</span>
+                    </div>
+                    <div class="feature-item">
+                        <span>🗂️</span>
+                        <span>Smart Flashcards</span>
+                    </div>
+                    <div class="feature-item">
+                        <span>📊</span>
+                        <span>Progress Tracking</span>
+                    </div>
+                    <div class="feature-item">
+                        <span>📚</span>
+                        <span>Study Materials</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer-simple">
+        <p>
+            Cloud Certification Study Hub | 
+            <a href="https://github.com/sohaib1khan/AWS_Exam_App.git" target="_blank" rel="noopener noreferrer">
+                View on GitHub ⭐
+            </a>
+        </p>
+    </footer>
+    
+    <script>
+        // Auto-focus username field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+        });
+        
+        // Add some interactive feedback
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
+

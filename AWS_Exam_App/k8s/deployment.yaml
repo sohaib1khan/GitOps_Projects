@@ -1,0 +1,165 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aws-study-app
+  labels:
+    app: aws-study-app
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-study-config
+  namespace: aws-study-app
+  labels:
+    app: aws-study-app
+data:
+  FLASK_ENV: "production"
+  FLASK_APP: "main.py"
+  DATA_PATH: "/app/data"
+
+---
+# Application Deployment with symlink setup
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-study-app
+  namespace: aws-study-app
+  labels:
+    app: aws-study-app
+    version: v1
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    app.kubernetes.io/deployed-at: "2025-06-20T05:30:00Z"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: aws-study-app
+  template:
+    metadata:
+      labels:
+        app: aws-study-app
+        version: v1
+    spec:
+      # Init container - copy files TO persistent volume (not symlinks)
+      initContainers:
+      - name: setup-data
+        image: CUSTOM_APP_IMAGE:latest
+        command: ['/bin/sh', '-c']
+        args:
+          - |
+            echo "=== Setting up persistent data ==="
+            
+            # Copy files from container to persistent volume ONLY if they don't exist
+            for file in users.json questions.json flashcards.json progress.json flashcard_progress.json; do
+              if [ ! -f "/data/$file" ]; then
+                echo "Copying default $file to persistent storage"
+                cp -v "/app/$file" "/data/"
+              else
+                echo "Preserving existing $file in persistent storage"
+              fi
+            done
+            
+            echo "=== Files in persistent storage ==="
+            ls -la /data/
+        volumeMounts:
+        - name: app-data
+          mountPath: /data
+      containers:
+      - name: flask-app
+        image: CUSTOM_APP_IMAGE:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5019
+          name: http
+          protocol: TCP
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: aws-study-config
+              key: FLASK_ENV
+        - name: FLASK_APP
+          valueFrom:
+            configMapKeyRef:
+              name: aws-study-config
+              key: FLASK_APP
+        - name: DATA_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: aws-study-config
+              key: DATA_PATH
+        # Mount persistent volume directly to where app expects files
+        volumeMounts:
+        - name: app-data
+          mountPath: /app/users.json
+          subPath: users.json
+        - name: app-data
+          mountPath: /app/questions.json
+          subPath: questions.json
+        - name: app-data
+          mountPath: /app/flashcards.json
+          subPath: flashcards.json
+        - name: app-data
+          mountPath: /app/progress.json
+          subPath: progress.json
+        - name: app-data
+          mountPath: /app/flashcard_progress.json
+          subPath: flashcard_progress.json
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5019
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5019
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: app-data
+        persistentVolumeClaim:
+          claimName: aws-study-data-pvc
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: aws-study-service
+  namespace: aws-study-app
+  labels:
+    app: aws-study-app
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 192.168.1.xxx # Replace with your desired IP
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.xxx # Replace with your desired IP
+  selector:
+    app: aws-study-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5019
+    protocol: TCP

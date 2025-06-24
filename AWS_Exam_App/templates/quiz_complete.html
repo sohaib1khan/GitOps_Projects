@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="quiz-complete-container">
+    <div class="completion-header">
+        <h2>🎉 Quiz Completed!</h2>
+        <p>Congratulations on completing the AWS Developer Associate quiz!</p>
+    </div>
+    
+    <div class="results-summary">
+        <div class="score-card">
+            <div class="score-circle">
+                <div class="score-percentage">{{ "%.0f"|format(results.score_percentage) }}%</div>
+                <div class="score-label">Score</div>
+            </div>
+        </div>
+        
+        <div class="results-details">
+            <div class="result-item">
+                <span class="result-label">Total Questions:</span>
+                <span class="result-value">{{ results.total_questions }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Questions Answered:</span>
+                <span class="result-value">{{ results.answered_questions }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Correct Answers:</span>
+                <span class="result-value correct">{{ results.correct_answers }}</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Incorrect Answers:</span>
+                <span class="result-value incorrect">{{ results.answered_questions - results.correct_answers }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Message -->
+    <div class="performance-message">
+        {% if results.score_percentage >= 80 %}
+            <div class="message excellent">
+                <h3>🌟 Excellent Work!</h3>
+                <p>You have a strong understanding of AWS Developer Associate concepts. Keep up the great work!</p>
+            </div>
+        {% elif results.score_percentage >= 60 %}
+            <div class="message good">
+                <h3>👍 Good Job!</h3>
+                <p>You're on the right track! Review the areas where you missed questions and you'll be ready for the exam.</p>
+            </div>
+        {% else %}
+            <div class="message needs-improvement">
+                <h3>📚 Keep Studying!</h3>
+                <p>Focus on reviewing the AWS Developer Associate concepts. Practice more questions to improve your understanding.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="quiz-actions">
+        <a href="{{ url_for('quiz_start') }}" class="button">Take Quiz Again</a>
+        <a href="{{ url_for('index') }}" class="button secondary">Return Home</a>
+        <a href="{{ url_for('add_question') }}" class="button secondary">Add More Questions</a>
+    </div>
+</div>
+
+<style>
+/* Quiz Completion Specific Styles */
+.quiz-complete-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.completion-header {
+    margin-bottom: 30px;
+}
+
+.completion-header h2 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.completion-header p {
+    color: var(--footer-color);
+    font-size: 16px;
+}
+
+.results-summary {
+    background-color: var(--progress-bg);
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+    transition: background-color 0.3s ease;
+}
+
+.score-card {
+    margin-bottom: 30px;
+}
+
+.score-circle {
+    display: inline-block;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff9900, #e88e00);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+}
+
+.score-percentage {
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.results-details {
+    display: grid;
+    gap: 15px;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-label {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.result-value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.result-value.correct {
+    color: #4caf50;
+}
+
+.result-value.incorrect {
+    color: #f44336;
+}
+
+.performance-message {
+    margin-bottom: 30px;
+}
+
+.message {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.message h3 {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.message.excellent {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #4caf50;
+}
+
+.message.good {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.message.needs-improvement {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #f44336;
+}
+
+[data-theme="dark"] .message.excellent {
+    background-color: #1e4d2b;
+    color: #4caf50;
+}
+
+[data-theme="dark"] .message.good {
+    background-color: #4d3d00;
+    color: #ffc107;
+}
+
+[data-theme="dark"] .message.needs-improvement {
+    background-color: #4d1e1e;
+    color: #f44336;
+}
+
+.quiz-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.quiz-actions .button {
+    min-width: 140px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .quiz-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .quiz-actions .button {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .score-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .score-percentage {
+        font-size: 24px;
+    }
+}
+</style>
+{% endblock %}

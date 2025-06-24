@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="welcome">
+    <h2>Welcome to the AWS Developer Associate Study Quiz</h2>
+    <p>Master AWS services and prepare for your certification exam with interactive quizzes and flashcards.</p>
+    
+    <!-- Progress Section -->
+    <div class="progress-section">
+        <h3>Your Progress</h3>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+        <div class="progress-counter" id="progress-counter">Loading...</div>
+        <button class="button reset-button" onclick="resetProgress()">Reset Progress</button>
+    </div>
+
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+        <div style="background-color: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.875rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;" id="total-questions">65</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;">Total Questions</div>
+        </div>
+        <div style="background-color: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.875rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;" id="completed-count">0</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;">Completed</div>
+        </div>
+        <div style="background-color: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.875rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;" id="success-rate">0%</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;">Success Rate</div>
+        </div>
+        <div style="background-color: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
+            <div style="font-size: 1.875rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">🏆</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;">Keep Going!</div>
+        </div>
+    </div>
+
+    <!-- Study Tips -->
+    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 0.75rem; padding: 2rem; margin: 2rem 0; text-align: center;">
+        <h3 style="margin-bottom: 1.5rem;">📚 Quick Study Tips</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+            <div style="background-color: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border-primary);">
+                <div style="font-size: 1.875rem; margin-bottom: 1rem;">🎯</div>
+                <h4 style="margin-bottom: 0.5rem;">Take Practice Quizzes</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">Regular practice helps reinforce key AWS concepts and identify knowledge gaps.</p>
+            </div>
+            <div style="background-color: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border-primary);">
+                <div style="font-size: 1.875rem; margin-bottom: 1rem;">🗂️</div>
+                <h4 style="margin-bottom: 0.5rem;">Use Flashcards</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">Perfect for memorizing AWS service names, features, and use cases on-the-go.</p>
+            </div>
+            <div style="background-color: var(--bg-secondary); padding: 1.5rem; border-radius: 0.75rem; border: 1px solid var(--border-primary);">
+                <div style="font-size: 1.875rem; margin-bottom: 1rem;">⏰</div>
+                <h4 style="margin-bottom: 0.5rem;">Study Consistently</h4>
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">15-30 minutes daily is more effective than cramming. Build a habit!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="actions">
+        <a href="{{ url_for('quiz') }}" class="button" style="padding: 1rem 2rem; font-size: 1rem; min-height: 3rem;">🎯 Start Quiz</a>
+        <a href="{{ url_for('flashcards') }}" class="button" style="padding: 1rem 2rem; font-size: 1rem; min-height: 3rem;">🗂️ Study Flashcards</a>
+    </div>
+
+    <!-- AWS Exam Info -->
+    <div style="background-color: var(--info-bg); border: 1px solid var(--info); border-radius: 0.75rem; padding: 2rem; margin: 2rem 0; text-align: center;">
+        <h3 style="color: var(--info); margin-bottom: 1.5rem;">🏅 AWS Developer Associate Exam</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="background-color: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; color: var(--text-primary);">
+                <strong>Duration:</strong> 130 minutes
+            </div>
+            <div style="background-color: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; color: var(--text-primary);">
+                <strong>Questions:</strong> 65 multiple choice
+            </div>
+            <div style="background-color: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; color: var(--text-primary);">
+                <strong>Passing Score:</strong> 720/1000
+            </div>
+            <div style="background-color: var(--bg-primary); padding: 1rem; border-radius: 0.5rem; color: var(--text-primary);">
+                <strong>Cost:</strong> $150 USD
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update stats with cache-busting
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/question_stats?v=' + Date.now())
+        .then(response => response.json())
+        .then(data => {
+            const total = data.total;
+            const completed = data.completed || 0;
+            const progress = data.progress || {};
+            
+            // Update stat cards
+            document.getElementById('total-questions').textContent = total;
+            document.getElementById('completed-count').textContent = completed;
+            
+            // Calculate success rate
+            const correctAnswers = Object.values(progress).filter(p => p.correct).length;
+            const successRate = completed > 0 ? Math.round((correctAnswers / completed) * 100) : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+            // Fallback values
+            document.getElementById('total-questions').textContent = '65';
+            document.getElementById('completed-count').textContent = '0';
+            document.getElementById('success-rate').textContent = '0%';
+        });
+});
+</script>
+{% endblock %}

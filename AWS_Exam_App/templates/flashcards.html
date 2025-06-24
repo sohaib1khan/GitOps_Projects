@@ -1,0 +1,443 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flashcards-container">
+    <h2>📚 Flashcards</h2>
+    
+    <!-- Statistics Dashboard -->
+    <div class="stats-dashboard">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_cards }}</div>
+            <div class="stat-label">Total Cards</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.studied_cards }}</div>
+            <div class="stat-label">Studied</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.due_cards }}</div>
+            <div class="stat-label">Due for Review</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.mastered_cards }}</div>
+            <div class="stat-label">Mastered</div>
+        </div>
+        <div class="stat-card accuracy">
+            <div class="stat-number">{{ "%.0f"|format(stats.accuracy_rate) }}%</div>
+            <div class="stat-label">Accuracy</div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flashcard-actions">
+        <a href="{{ url_for('add_flashcard') }}" class="button primary">🃏 Add New Flashcard</a>
+        <a href="{{ url_for('study_flashcards') }}" class="button study">📖 Study All Cards</a>
+        <a href="{{ url_for('study_flashcards', due_only='true') }}" class="button review">⏰ Review Due Cards</a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="filter-section">
+        <h3>📂 Filter by Category</h3>
+        <div class="category-filters">
+            <button class="filter-btn active" onclick="filterCards('all')">All ({{ stats.total_cards }})</button>
+            {% for category, count in stats.categories.items() %}
+                <button class="filter-btn" onclick="filterCards('{{ category|lower }}')">{{ category }} ({{ count.total }})</button>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Flashcards List -->
+    <div class="flashcards-list">
+        {% if flashcards %}
+            <div class="list-header">
+                <h3>📋 Manage Your Flashcards</h3>
+                <div class="list-controls">
+                    <input type="text" id="search-cards" placeholder="🔍 Search flashcards..." onkeyup="searchCards()">
+                </div>
+            </div>
+            
+            <div class="flashcards-grid" id="flashcards-grid">
+                {% for flashcard in flashcards %}
+                <div class="flashcard-item" data-category="{{ flashcard.category|lower }}" data-search="{{ (flashcard.front + ' ' + flashcard.back + ' ' + flashcard.category)|lower }}">
+                    <div class="flashcard-preview">
+                        <div class="card-side front">
+                            <div class="card-label">Front</div>
+                            <div class="card-content">{{ flashcard.front[:100] }}{% if flashcard.front|length > 100 %}...{% endif %}</div>
+                        </div>
+                        <div class="card-side back">
+                            <div class="card-label">Back</div>
+                            <div class="card-content">{{ flashcard.back[:100] }}{% if flashcard.back|length > 100 %}...{% endif %}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flashcard-meta">
+                        <div class="meta-info">
+                            <span class="category-tag">{{ flashcard.category }}</span>
+                            <span class="difficulty-tag {{ flashcard.difficulty }}">{{ flashcard.difficulty|title }}</span>
+                            {% if flashcard.progress %}
+                                <span class="confidence-indicator">
+                                    {% set confidence = flashcard.progress.get('confidence_level', 0) %}
+                                    {% for i in range(5) %}
+                                        <span class="star {{ 'filled' if i < confidence else 'empty' }}">⭐</span>
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-actions">
+                            <a href="{{ url_for('edit_flashcard', card_id=flashcard.id) }}" class="action-btn edit" title="Edit">✏️</a>
+                            <form action="{{ url_for('delete_flashcard', card_id=flashcard.id) }}" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this flashcard?');">
+                                <button type="submit" class="action-btn delete" title="Delete">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    {% if flashcard.progress %}
+                        <div class="progress-info">
+                            <small>
+                                Studied {{ flashcard.progress.times_studied }} times • 
+                                {{ flashcard.progress.times_correct }} correct, {{ flashcard.progress.times_incorrect }} incorrect
+                                {% if flashcard.progress.last_studied %}
+                                    • Last: {{ flashcard.progress.last_studied[:10] }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🃏</div>
+                <h3>No Flashcards Yet</h3>
+                <p>Create your first flashcard to start studying!</p>
+                <a href="{{ url_for('add_flashcard') }}" class="button primary">Add Your First Flashcard</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Flashcards specific styles */
+.flashcards-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stats-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: #ff9900;
+    transform: translateY(-2px);
+}
+
+.stat-card.accuracy {
+    background: linear-gradient(135deg, #ff9900, #e88e00);
+    color: white;
+    border-color: #ff9900;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.flashcard-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.button.primary {
+    background: #ff9900;
+    color: white;
+}
+
+.button.study {
+    background: #4caf50;
+    color: white;
+}
+
+.button.review {
+    background: #f44336;
+    color: white;
+}
+
+.filter-section {
+    margin-bottom: 30px;
+}
+
+.filter-section h3 {
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.category-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: #ff9900;
+    color: white;
+    border-color: #ff9900;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.list-controls input {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 25px;
+    width: 300px;
+    max-width: 100%;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+.flashcards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.flashcard-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.flashcard-item:hover {
+    border-color: #ff9900;
+    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.1);
+}
+
+.flashcard-preview {
+    margin-bottom: 15px;
+}
+
+.card-side {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: var(--progress-bg);
+    border-radius: 5px;
+}
+
+.card-label {
+    font-size: 12px;
+    color: var(--footer-color);
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.card-content {
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.flashcard-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.meta-info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.category-tag, .difficulty-tag {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.category-tag {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.difficulty-tag.easy {
+    background: #e8f5e8;
+    color: #4caf50;
+}
+
+.difficulty-tag.medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.difficulty-tag.hard {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+[data-theme="dark"] .category-tag {
+    background: #1a237e;
+    color: #90caf9;
+}
+
+.confidence-indicator .star {
+    font-size: 10px;
+}
+
+.confidence-indicator .star.empty {
+    opacity: 0.3;
+}
+
+.card-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.action-btn {
+    padding: 5px 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.action-btn:hover {
+    background: var(--progress-bg);
+}
+
+.delete-form {
+    display: inline;
+}
+
+.progress-info {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+    color: var(--footer-color);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--footer-color);
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .flashcard-actions {
+        justify-content: stretch;
+    }
+    
+    .flashcard-actions .button {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .list-controls input {
+        width: 100%;
+    }
+    
+    .flashcards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Filter flashcards by category
+function filterCards(category) {
+    const cards = document.querySelectorAll('.flashcard-item');
+    const buttons = document.querySelectorAll('.filter-btn');
+    
+    // Update active button
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Show/hide cards
+    cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Search flashcards
+function searchCards() {
+    const searchTerm = document.getElementById('search-cards').value.toLowerCase();
+    const cards = document.querySelectorAll('.flashcard-item');
+    
+    cards.forEach(card => {
+        const searchText = card.dataset.search;
+        if (searchText.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

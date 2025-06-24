@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="add-question-container">
+    <h2>Add a New Question</h2>
+    
+    <form action="{{ url_for('add_question') }}" method="post" class="question-form">
+        <div class="form-group">
+            <label for="question">Question: <span class="markdown-note">(Markdown supported)</span></label>
+            <div class="markdown-field">
+                <textarea name="question" id="question" required class="markdown-editor"></textarea>
+                <div class="markdown-preview-container">
+                    <div class="preview-header">Preview:</div>
+                    <div class="markdown-preview"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Type Selection -->
+        <div class="form-group">
+            <label>Question Type:</label>
+            <div class="question-type-options">
+                <div class="type-option">
+                    <input type="radio" name="question_type" id="single_choice" value="single" checked>
+                    <label for="single_choice">Single Choice (Select one answer)</label>
+                </div>
+                <div class="type-option">
+                    <input type="radio" name="question_type" id="multiple_choice" value="multiple">
+                    <label for="multiple_choice">Multiple Choice (Select all that apply)</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Answer Options:</label>
+            <div class="option-inputs">
+                <div class="option-row">
+                    <input type="text" name="option1" id="option1" placeholder="Option 1" required>
+                    <div class="correct-indicator">
+                        <input type="checkbox" name="correct_answer_1" id="correct1" class="correct-checkbox" style="display: none;">
+                        <label for="correct1" class="checkbox-label" style="display: none;">✓</label>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <input type="text" name="option2" id="option2" placeholder="Option 2" required>
+                    <div class="correct-indicator">
+                        <input type="checkbox" name="correct_answer_2" id="correct2" class="correct-checkbox" style="display: none;">
+                        <label for="correct2" class="checkbox-label" style="display: none;">✓</label>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <input type="text" name="option3" id="option3" placeholder="Option 3">
+                    <div class="correct-indicator">
+                        <input type="checkbox" name="correct_answer_3" id="correct3" class="correct-checkbox" style="display: none;">
+                        <label for="correct3" class="checkbox-label" style="display: none;">✓</label>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <input type="text" name="option4" id="option4" placeholder="Option 4">
+                    <div class="correct-indicator">
+                        <input type="checkbox" name="correct_answer_4" id="correct4" class="correct-checkbox" style="display: none;">
+                        <label for="correct4" class="checkbox-label" style="display: none;">✓</label>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <input type="text" name="option5" id="option5" placeholder="Option 5">
+                    <div class="correct-indicator">
+                        <input type="checkbox" name="correct_answer_5" id="correct5" class="correct-checkbox" style="display: none;">
+                        <label for="correct5" class="checkbox-label" style="display: none;">✓</label>
+                    </div>
+                </div>
+                
+                <div class="option-row">
+                    <input type="text" name="option6" id="option6" placeholder="Option 6">
+                    <div class="correct-indicator">
+                        <input type="checkbox" name="correct_answer_6" id="correct6" class="correct-checkbox" style="display: none;">
+                        <label for="correct6" class="checkbox-label" style="display: none;">✓</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Single Choice Correct Answer (shown by default) -->
+        <div class="form-group" id="single-answer-group">
+            <label for="correct_answer">Correct Answer:</label>
+            <select name="correct_answer" id="correct_answer" required>
+                <option value="">Select the correct option</option>
+            </select>
+            <small>Choose which option is correct</small>
+        </div>
+        
+        <!-- Multiple Choice Instructions (hidden by default) -->
+        <div class="form-group" id="multiple-answer-group" style="display: none;">
+            <label>Correct Answers:</label>
+            <p class="instruction-text">Check the ✓ boxes next to the correct options above. You can select multiple correct answers.</p>
+            <small>At least one answer must be marked as correct</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="explanation">Explanation: <span class="markdown-note">(Markdown supported)</span></label>
+            <div class="markdown-field">
+                <textarea name="explanation" id="explanation" required class="markdown-editor"></textarea>
+                <div class="markdown-preview-container">
+                    <div class="preview-header">Preview:</div>
+                    <div class="markdown-preview"></div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="button">Add Question</button>
+    </form>
+</div>
+
+<style>
+/* Additional styles for multiple choice support */
+.question-type-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.type-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.type-option input[type="radio"] {
+    margin: 0;
+}
+
+.type-option label {
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.option-row input[type="text"] {
+    flex: 1;
+}
+
+.correct-indicator {
+    display: flex;
+    align-items: center;
+    min-width: 30px;
+}
+
+.checkbox-label {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    color: transparent;
+}
+
+.correct-checkbox:checked + .checkbox-label {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+}
+
+.checkbox-label:hover {
+    border-color: #4caf50;
+}
+
+.instruction-text {
+    color: var(--footer-color);
+    font-style: italic;
+    margin: 5px 0;
+}
+
+.option-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Dark theme support */
+[data-theme="dark"] .checkbox-label {
+    border-color: #555;
+    background-color: var(--card-bg);
+}
+
+[data-theme="dark"] .checkbox-label:hover {
+    border-color: #4caf50;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const singleChoice = document.getElementById('single_choice');
+    const multipleChoice = document.getElementById('multiple_choice');
+    const singleAnswerGroup = document.getElementById('single-answer-group');
+    const multipleAnswerGroup = document.getElementById('multiple-answer-group');
+    const correctAnswerSelect = document.getElementById('correct_answer');
+    const checkboxes = document.querySelectorAll('.correct-checkbox');
+    const checkboxLabels = document.querySelectorAll('.checkbox-label');
+    const optionInputs = document.querySelectorAll('input[name^="option"]');
+    
+    // Toggle question type
+    function toggleQuestionType() {
+        const isMultiple = multipleChoice.checked;
+        
+        if (isMultiple) {
+            singleAnswerGroup.style.display = 'none';
+            multipleAnswerGroup.style.display = 'block';
+            checkboxes.forEach(cb => cb.style.display = 'inline-block');
+            checkboxLabels.forEach(label => label.style.display = 'inline-block');
+            correctAnswerSelect.removeAttribute('required');
+        } else {
+            singleAnswerGroup.style.display = 'block';
+            multipleAnswerGroup.style.display = 'none';
+            checkboxes.forEach(cb => cb.style.display = 'none');
+            checkboxLabels.forEach(label => label.style.display = 'none');
+            correctAnswerSelect.setAttribute('required', 'required');
+            // Clear checkboxes when switching to single
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+        
+        updateCorrectAnswerDropdown();
+    }
+    
+    // Update dropdown options based on entered text
+    function updateCorrectAnswerDropdown() {
+        if (singleChoice.checked) {
+            correctAnswerSelect.innerHTML = '<option value="">Select the correct option</option>';
+            
+            optionInputs.forEach((input, index) => {
+                if (input.value.trim()) {
+                    const option = document.createElement('option');
+                    option.value = input.value.trim();
+                    option.textContent = `Option ${index + 1}: ${input.value.trim()}`;
+                    correctAnswerSelect.appendChild(option);
+                }
+            });
+        }
+    }
+    
+    // Event listeners
+    singleChoice.addEventListener('change', toggleQuestionType);
+    multipleChoice.addEventListener('change', toggleQuestionType);
+    
+    // Update dropdown when options change
+    optionInputs.forEach(input => {
+        input.addEventListener('input', updateCorrectAnswerDropdown);
+    });
+    
+    // Form validation
+    document.querySelector('.question-form').addEventListener('submit', function(e) {
+        if (multipleChoice.checked) {
+            // Check if at least one correct answer is selected
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            if (!anyChecked) {
+                e.preventDefault();
+                alert('Please select at least one correct answer for multiple choice questions.');
+                return;
+            }
+            
+            // Check that checked answers correspond to filled options
+            let validCorrectAnswers = false;
+            checkboxes.forEach((cb, index) => {
+                if (cb.checked) {
+                    const optionInput = document.getElementById(`option${index + 1}`);
+                    if (optionInput && optionInput.value.trim()) {
+                        validCorrectAnswers = true;
+                    }
+                }
+            });
+            
+            if (!validCorrectAnswers) {
+                e.preventDefault();
+                alert('Please make sure correct answers correspond to filled option fields.');
+                return;
+            }
+        }
+    });
+    
+    // Initialize
+    toggleQuestionType();
+    updateCorrectAnswerDropdown();
+});
+</script>
+{% endblock %}

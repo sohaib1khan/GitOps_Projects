@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="edit-flashcard-container">
+    <h2>✏️ Edit Flashcard</h2>
+    
+    <form action="{{ url_for('edit_flashcard', card_id=card.id) }}" method="post" class="flashcard-form">
+        <!-- Front Side -->
+        <div class="form-group">
+            <label for="front">Front Side (Question/Prompt): <span class="markdown-note">(Markdown supported)</span></label>
+            <div class="markdown-field">
+                <textarea name="front" id="front" required class="markdown-editor" placeholder="What goes on the front of your flashcard?">{{ card.front }}</textarea>
+                <div class="markdown-preview-container">
+                    <div class="preview-header">Preview:</div>
+                    <div class="markdown-preview" id="front-preview">{{ card.front | safe }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back Side -->
+        <div class="form-group">
+            <label for="back">Back Side (Answer/Explanation): <span class="markdown-note">(Markdown supported)</span></label>
+            <div class="markdown-field">
+                <textarea name="back" id="back" required class="markdown-editor" placeholder="What goes on the back?">{{ card.back }}</textarea>
+                <div class="markdown-preview-container">
+                    <div class="preview-header">Preview:</div>
+                    <div class="markdown-preview" id="back-preview">{{ card.back | safe }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category -->
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <div class="category-input-container">
+                <input type="text" name="category" id="category" value="{{ card.category }}" placeholder="e.g., Storage, Compute, Database, Security">
+                {% if categories %}
+                    <div class="category-suggestions">
+                        <label>Or choose existing:</label>
+                        <div class="category-chips">
+                            {% for cat in categories %}
+                                <button type="button" class="category-chip {{ 'active' if cat == card.category else '' }}" onclick="selectCategory('{{ cat }}')">{{ cat }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Difficulty -->
+        <div class="form-group">
+            <label>Difficulty Level:</label>
+            <div class="difficulty-options">
+                <div class="difficulty-option">
+                    <input type="radio" name="difficulty" id="easy" value="easy" {% if card.difficulty == 'easy' %}checked{% endif %}>
+                    <label for="easy">🟢 Easy</label>
+                    <small>Basic concepts, definitions</small>
+                </div>
+                <div class="difficulty-option">
+                    <input type="radio" name="difficulty" id="medium" value="medium" {% if card.difficulty == 'medium' or not card.difficulty %}checked{% endif %}>
+                    <label for="medium">🟡 Medium</label>
+                    <small>Moderate complexity, common scenarios</small>
+                </div>
+                <div class="difficulty-option">
+                    <input type="radio" name="difficulty" id="hard" value="hard" {% if card.difficulty == 'hard' %}checked{% endif %}>
+                    <label for="hard">🔴 Hard</label>
+                    <small>Advanced topics, complex scenarios</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tags -->
+        <div class="form-group">
+            <label for="tags">Tags (Optional):</label>
+            <input type="text" name="tags" id="tags" value="{% if card.tags %}{{ card.tags | join(', ') }}{% endif %}" placeholder="e.g., aws, storage, backup, durability (comma-separated)">
+            <small>Add tags to help organize and search your flashcards</small>
+        </div>
+        
+        <!-- Preview Card -->
+        <div class="form-group">
+            <label>Preview Your Changes:</label>
+            <div class="flashcard-preview-container">
+                <div class="flashcard-3d" id="flashcard-preview">
+                    <div class="flashcard-front">
+                        <div class="card-header">Front</div>
+                        <div class="card-content" id="preview-front-content">
+                            {{ card.front | safe }}
+                        </div>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="card-header">Back</div>
+                        <div class="card-content" id="preview-back-content">
+                            {{ card.back | safe }}
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="flip-button" onclick="flipPreviewCard()">🔄 Flip Card</button>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="button primary">💾 Update Flashcard</button>
+            <a href="{{ url_for('flashcards') }}" class="button secondary">Cancel</a>
+            <a href="{{ url_for('edit_flashcard', card_id=card.id) }}" class="button warning" onclick="return confirm('Are you sure you want to reset all changes?')">🔄 Reset</a>
+        </div>
+    </form>
+</div>
+
+<style>
+/* Edit Flashcard specific styles - reuse most from add_flashcard.html */
+.edit-flashcard-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.flashcard-form .form-group {
+    margin-bottom: 25px;
+}
+
+.flashcard-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.flashcard-form input[type="text"],
+.flashcard-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.flashcard-form input[type="text"]:focus,
+.flashcard-form textarea:focus {
+    outline: none;
+    border-color: #ff9900;
+}
+
+.flashcard-form textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.markdown-note {
+    font-size: 12px;
+    color: var(--footer-color);
+    font-weight: normal;
+}
+
+.markdown-field {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.markdown-preview-container {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    background: var(--progress-bg);
+    min-height: 120px;
+    overflow-y: auto;
+}
+
+.preview-header {
+    font-size: 12px;
+    color: var(--footer-color);
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.markdown-preview {
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.category-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.category-suggestions {
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.category-suggestions label {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--footer-color);
+}
+
+.category-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.category-chip {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.category-chip:hover,
+.category-chip.active {
+    background: #ff9900;
+    color: white;
+    border-color: #ff9900;
+}
+
+.difficulty-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.difficulty-option {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.difficulty-option:hover {
+    border-color: #ff9900;
+    background: var(--progress-bg);
+}
+
+.difficulty-option input[type="radio"] {
+    margin-right: 8px;
+}
+
+.difficulty-option label {
+    font-weight: bold;
+    margin: 0;
+    cursor: pointer;
+}
+
+.difficulty-option small {
+    display: block;
+    color: var(--footer-color);
+    margin-top: 5px;
+}
+
+.flashcard-preview-container {
+    text-align: center;
+}
+
+.flashcard-3d {
+    width: 300px;
+    height: 200px;
+    margin: 0 auto 15px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+
+.flashcard-3d.flipped {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border: 2px solid #ff9900;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-bg);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.flashcard-back {
+    transform: rotateY(180deg);
+}
+
+.card-header {
+    background: #ff9900;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.card-content {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text-color);
+    text-align: left;
+}
+
+.flip-button {
+    padding: 8px 16px;
+    background: #ff9900;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.flip-button:hover {
+    background: #e88e00;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.button.primary {
+    background: #ff9900;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+}
+
+.button.secondary {
+    background: var(--border-color);
+    color: var(--text-color);
+}
+
+.button.warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .markdown-field {
+        grid-template-columns: 1fr;
+    }
+    
+    .difficulty-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .flashcard-3d {
+        width: 280px;
+        height: 180px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const frontTextarea = document.getElementById('front');
+    const backTextarea = document.getElementById('back');
+    const frontPreview = document.getElementById('front-preview');
+    const backPreview = document.getElementById('back-preview');
+    const previewFrontContent = document.getElementById('preview-front-content');
+    const previewBackContent = document.getElementById('preview-back-content');
+    
+    // Update markdown previews
+    function updateMarkdownPreview(textarea, previewElement) {
+        const text = textarea.value;
+        if (!text.trim()) return;
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '{{ url_for("markdown_preview") }}', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                previewElement.innerHTML = xhr.responseText;
+            }
+        };
+        
+        xhr.send('text=' + encodeURIComponent(text));
+    }
+    
+    // Update card preview
+    function updateCardPreview() {
+        const frontText = frontTextarea.value.trim();
+        const backText = backTextarea.value.trim();
+        
+        previewFrontContent.innerHTML = frontText || '<em>Front side content...</em>';
+        previewBackContent.innerHTML = backText || '<em>Back side content...</em>';
+        
+        // Update markdown previews
+        if (frontText) updateMarkdownPreview(frontTextarea, frontPreview);
+        if (backText) updateMarkdownPreview(backTextarea, backPreview);
+    }
+    
+    // Event listeners
+    frontTextarea.addEventListener('input', updateCardPreview);
+    backTextarea.addEventListener('input', updateCardPreview);
+    
+    // Initialize previews
+    updateMarkdownPreview(frontTextarea, frontPreview);
+    updateMarkdownPreview(backTextarea, backPreview);
+});
+
+// Flip preview card
+function flipPreviewCard() {
+    const card = document.getElementById('flashcard-preview');
+    card.classList.toggle('flipped');
+}
+
+// Select category chip
+function selectCategory(category) {
+    document.getElementById('category').value = category;
+    
+    // Update active state
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+// Handle difficulty option clicks
+document.addEventListener('DOMContentLoaded', function() {
+    const difficultyOptions = document.querySelectorAll('.difficulty-option');
+    
+    difficultyOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+        });
+    });
+});
+</script>
+{% endblock %}

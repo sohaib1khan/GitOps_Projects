@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block title %}Study Flashcards{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center mb-4">Study Flashcards</h2>
+            
+            {% if current_card %}
+            <div class="card-study-container">
+                <div class="progress mb-4">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: {{ progress }}%" 
+                         aria-valuenow="{{ progress }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ cards_studied }}/{{ total_cards }}
+                    </div>
+                </div>
+
+                <div class="flashcard-container text-center">
+                    <div class="flashcard" id="flashcard" onclick="flipCard()">
+                        <div class="flashcard-front" id="card-front">
+                            <h4>{{ current_card.category or 'General' }}</h4>
+                            <div class="card-content">
+                                {{ current_card.front | safe }}
+                            </div>
+                            <p class="text-muted mt-3">Click to reveal answer</p>
+                        </div>
+                        
+                        <div class="flashcard-back" id="card-back" style="display: none;">
+                            <h4>Answer</h4>
+                            <div class="card-content">
+                                {{ current_card.back | safe }}
+                            </div>
+                            <p class="text-muted mt-3">Click to flip back</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="study-controls mt-4 text-center">
+                    <div class="difficulty-buttons mb-3" id="difficulty-buttons" style="display: none;">
+                        <h5>How well did you know this?</h5>
+                        <form method="POST" action="{{ url_for('study_card') }}" class="d-inline">
+                            <input type="hidden" name="card_id" value="{{ current_card.id }}">
+                            <input type="hidden" name="action" value="rate">
+                            <button type="submit" name="difficulty" value="hard" class="btn btn-danger mx-1">
+                                Hard 😓
+                            </button>
+                            <button type="submit" name="difficulty" value="medium" class="btn btn-warning mx-1">
+                                Medium 🤔
+                            </button>
+                            <button type="submit" name="difficulty" value="easy" class="btn btn-success mx-1">
+                                Easy 😊
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <a href="{{ url_for('flashcards') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Flashcards
+                        </a>
+                        
+                        <button onclick="showAnswer()" id="show-answer-btn" class="btn btn-primary">
+                            Show Answer
+                        </button>
+                        
+                        <form method="POST" action="{{ url_for('study_card') }}" class="d-inline">
+                            <input type="hidden" name="action" value="skip">
+                            <button type="submit" class="btn btn-warning">
+                                Skip <i class="fas fa-forward"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="text-center">
+                <h4>Study Session Complete! 🎉</h4>
+                <p>You've studied all available flashcards.</p>
+                <div class="mt-4">
+                    <a href="{{ url_for('flashcards') }}" class="btn btn-primary">Back to Flashcards</a>
+                    <a href="{{ url_for('study_card') }}?restart=1" class="btn btn-success">Study Again</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Container and Layout */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.d-inline {
+    display: inline;
+}
+
+/* Progress Bar */
+.progress {
+    height: 25px;
+    background-color: #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #ff9900, #ffb366);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.6s ease;
+    border-radius: 12px;
+}
+
+/* Flashcard Styling */
+.flashcard-container {
+    perspective: 1000px;
+    margin: 2rem 0;
+}
+
+.flashcard {
+    width: 100%;
+    height: 300px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.flashcard-front {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.flashcard-back {
+    background: linear-gradient(135deg,rgb(26, 23, 193) 0%,rgb(2, 176, 25) 100%);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+.flashcard.flipped {
+    transform: rotateY(180deg);
+}
+
+.card-content {
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.text-muted {
+    opacity: 0.8;
+}
+
+/* Button Styling */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin: 3px;
+    min-width: 120px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-primary {
+    background: #ff9900;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #e88e00;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background: #e0a800;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background:rgb(78, 189, 5);
+    color: white;
+}
+
+.btn-danger:hover {
+    background:rgb(103, 207, 12);
+}
+
+/* Study Controls */
+.study-controls {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.difficulty-buttons {
+    margin-bottom: 20px;
+}
+
+.difficulty-buttons h5 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.mx-1 {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+}
+
+/* Alert styling for keyboard shortcuts */
+.alert {
+    padding: 12px 20px;
+    margin-top: 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+kbd {
+    padding: 2px 6px;
+    font-size: 11px;
+    color: #fff;
+    background-color: #212529;
+    border-radius: 3px;
+    margin: 0 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .flashcard {
+        height: 250px;
+    }
+    
+    .card-content {
+        font-size: 1rem;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .difficulty-buttons .btn {
+        display: block;
+        width: 100%;
+        margin: 8px 0;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .flashcard {
+        height: 220px;
+        padding: 1rem;
+    }
+    
+    .card-content {
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        min-width: auto;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+</style>
+
+<script>
+let isFlipped = false;
+
+function flipCard() {
+    const flashcard = document.getElementById('flashcard');
+    const frontCard = document.getElementById('card-front');
+    const backCard = document.getElementById('card-back');
+    
+    if (!isFlipped) {
+        flashcard.classList.add('flipped');
+        setTimeout(() => {
+            frontCard.style.display = 'none';
+            backCard.style.display = 'flex';
+        }, 300);
+        isFlipped = true;
+        showDifficultyButtons();
+    } else {
+        frontCard.style.display = 'flex';
+        backCard.style.display = 'none';
+        flashcard.classList.remove('flipped');
+        isFlipped = false;
+        hideDifficultyButtons();
+    }
+}
+
+function showAnswer() {
+    if (!isFlipped) {
+        flipCard();
+    }
+    document.getElementById('show-answer-btn').style.display = 'none';
+}
+
+function showDifficultyButtons() {
+    document.getElementById('difficulty-buttons').style.display = 'block';
+    document.getElementById('show-answer-btn').style.display = 'none';
+}
+
+function hideDifficultyButtons() {
+    document.getElementById('difficulty-buttons').style.display = 'none';
+    document.getElementById('show-answer-btn').style.display = 'inline-block';
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+        case ' ':
+        case 'Enter':
+            e.preventDefault();
+            if (!isFlipped) {
+                showAnswer();
+            }
+            break;
+        case 'ArrowRight':
+        case 'n':
+            // Skip to next card
+            if (isFlipped) {
+                document.querySelector('button[name="difficulty"][value="medium"]').click();
+            }
+            break;
+        case '1':
+            if (isFlipped) {
+                document.querySelector('button[name="difficulty"][value="hard"]').click();
+            }
+            break;
+        case '2':
+            if (isFlipped) {
+                document.querySelector('button[name="difficulty"][value="medium"]').click();
+            }
+            break;
+        case '3':
+            if (isFlipped) {
+                document.querySelector('button[name="difficulty"][value="easy"]').click();
+            }
+            break;
+    }
+});
+
+// Show keyboard shortcuts hint
+document.addEventListener('DOMContentLoaded', function() {
+    const hint = document.createElement('div');
+    hint.className = 'alert alert-info mt-3';
+    hint.innerHTML = `
+        <small>
+            <strong>Keyboard Shortcuts:</strong>
+            <kbd>Space</kbd> Show Answer | 
+            <kbd>1</kbd> Hard | 
+            <kbd>2</kbd> Medium | 
+            <kbd>3</kbd> Easy
+        </small>
+    `;
+    document.querySelector('.study-controls').appendChild(hint);
+});
+</script>
+{% endblock %}
