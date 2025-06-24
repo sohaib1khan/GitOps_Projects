@@ -208,23 +208,6 @@ ls -la /home/k8server/FlaskGitOpsData/
 argocd repo list
 ```
 
----
-
-## 📖 Documentation & Resources
-
-### **Architecture References**
-- 📊 **[Interactive Architecture Diagram](https://sohaib1khan.github.io/GitOps_Projects/)** - Complete visual overview
-- 📋 **[Setup Guide](docs/setup-guide.md)** - Step-by-step implementation
-- 🔧 **[Configuration Examples](k8s/)** - Kubernetes manifest templates
-- 🚀 **[Pipeline Templates](jenkins/)** - Jenkins CI/CD configurations
-
-### **Best Practices Implemented**
-- **🔒 Security**: Non-root containers, resource limits, secret management
-- **📊 Observability**: Health checks, logging, monitoring integration
-- **🔄 Reliability**: Rolling updates, replica management, data persistence
-- **⚡ Performance**: Resource optimization, efficient image layering
-- **🛡️ Resilience**: Auto-healing, backup strategies, disaster recovery
-
 
 ---
 
