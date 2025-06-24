@@ -225,53 +225,10 @@ argocd repo list
 - **⚡ Performance**: Resource optimization, efficient image layering
 - **🛡️ Resilience**: Auto-healing, backup strategies, disaster recovery
 
----
-
-## 🎯 Professional Development
-
-### **DevOps Journey**
-This repository represents my transition from **RPA Support Engineer** to **DevOps practitioner**, showcasing:
-
-- **🐍 Python Development**: Growing proficiency in application development
-- **☸️ Kubernetes Expertise**: Container orchestration and cluster management  
-- **🔄 CI/CD Mastery**: Automated pipeline design and implementation
-- **🏗️ Infrastructure as Code**: Declarative infrastructure management
-- **📊 Monitoring & Operations**: Production-ready deployment practices
-
-### **Continuous Learning**
-- Regular practice with new DevOps tools and methodologies
-- Implementation of industry best practices and patterns
-- Contribution to open-source DevOps community
-- Hands-on experience with enterprise-grade infrastructure
 
 ---
 
-## 🤝 Connect & Collaborate
-
-### **Repository Highlights**
-- ⭐ **2 Stars** - Community recognition
-- 👀 **1 Watching** - Active monitoring
-- 🍴 **0 Forks** - Open for collaboration
-
-### **Get Involved**
-- 🐛 **Issues**: Report bugs or suggest improvements
-- 💡 **Discussions**: Share ideas and best practices
-- 🔀 **Pull Requests**: Contribute enhancements
-- ⭐ **Star**: Show support for the project
-
 ---
-
-## 📧 Contact & Support
-
-**Sohaib Khan** - RPA Support Engineer | DevOps Enthusiast
-
-- 📧 **Email**: [Your email]
-- 💼 **LinkedIn**: [Your LinkedIn profile]
-- 🐙 **GitHub**: [@sohaib1khan](https://github.com/sohaib1khan)
-- 📊 **Live Demo**: [GitOps Architecture](https://sohaib1khan.github.io/GitOps_Projects/)
-
----
-
 <div align="center">
 
 ### **🚀 Transforming Infrastructure Through Code**
