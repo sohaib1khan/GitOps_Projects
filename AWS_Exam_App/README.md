@@ -45,26 +45,6 @@ GitOps_Projects/
 └── 📖 README.md                      # This comprehensive guide
 ```
 
----
-
-## 🎓 Learning Objectives & Skills Demonstrated
-
-### **DevOps Core Competencies**
-- ✅ **GitOps Methodology** - Declarative infrastructure and application management
-- ✅ **CI/CD Pipeline Design** - Automated build, test, and deployment workflows
-- ✅ **Container Orchestration** - Kubernetes deployment and management
-- ✅ **Infrastructure as Code** - Kubernetes manifests and configuration management
-- ✅ **Monitoring & Observability** - Application health checks and logging
-
-### **Technical Stack Proficiency**
-- ✅ **Kubernetes/K3s** - Container orchestration on Proxmox infrastructure
-- ✅ **Jenkins** - Continuous Integration and automated pipeline execution
-- ✅ **ArgoCD** - GitOps continuous delivery and sync management
-- ✅ **Docker** - Application containerization and image management
-- ✅ **Python/Flask** - Backend application development and API design
-- ✅ **MetalLB** - Load balancing for bare-metal Kubernetes clusters
-
----
 
 ## 🚀 Complete GitOps Workflow
 
@@ -136,13 +116,6 @@ Complete web application with:
 - Containerized deployment with persistent user data
 - CI/CD integration for continuous content updates
 
-### **3. DashLink Dashboard**
-**Purpose**: Centralized application and service management
-- Service discovery and health monitoring
-- Quick access portal for development tools
-- Responsive design for mobile and desktop access
-
----
 
 ## 🔧 Quick Start Guide
 
@@ -158,7 +131,7 @@ Complete web application with:
 ```bash
 # Clone the repository
 git clone https://github.com/sohaib1khan/GitOps_Projects.git
-cd GitOps_Projects
+cd GitOps_Projects/AWS_Exam_App
 
 # Deploy data persistence layer (one-time setup)
 kubectl apply -f k8s/data-setup.yaml
