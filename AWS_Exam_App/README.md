@@ -18,7 +18,7 @@ Experience our complete GitOps pipeline through an interactive, multi-tab visual
 
 <div align="center">
 
-**[🔗 View Interactive Diagram](https://sohaib1khan.github.io/GitOps_Projects/)**
+**[🔗 View Interactive Diagram](https://sohaib1khan.github.io/GitOps_Projects/repo-overview.html)**
 
 *Click above to explore the full architecture with interactive components*
 
@@ -183,14 +183,12 @@ argocd repo list
 
 
 ---
-
----
 <div align="center">
 
 ### **🚀 Transforming Infrastructure Through Code**
 
 
-**[🔗 Explore the Interactive Architecture](https://sohaib1khan.github.io/GitOps_Projects/)**
+**[🔗 Explore the Interactive Architecture](https://sohaib1khan.github.io/GitOps_Projects/repo-overview.html)**
 
 </div>
 
