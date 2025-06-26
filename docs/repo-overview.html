@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitOps Learning Repository Architecture</title>
+    <title>GitOps Architecture Diagram</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0f1419 0%, #1e3a8a 50%, #7c3aed 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -21,99 +21,67 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
-            backdrop-filter: blur(10px);
         }
 
         .header {
-            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #ec4899 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px;
+            padding: 30px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
         }
 
         .header h1 {
-            font-size: 3em;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.3em;
-            opacity: 0.95;
+            font-size: 2.5em;
             margin-bottom: 10px;
         }
 
-        .header .subtitle {
-            font-size: 1em;
-            opacity: 0.8;
-            font-style: italic;
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
         }
 
         .tabs {
             display: flex;
-            background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 100%);
-            border-bottom: 3px solid #e2e8f0;
-            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
         }
 
         .tab {
             flex: 1;
-            padding: 18px 25px;
+            padding: 15px 20px;
             text-align: center;
             cursor: pointer;
             background: transparent;
             border: none;
             font-size: 16px;
-            font-weight: 700;
-            color: #475569;
+            font-weight: 600;
+            color: #495057;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .tab.active {
-            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-            color: #1e40af;
-            border-bottom: 4px solid #1e40af;
-            box-shadow: 0 -2px 10px rgba(30, 64, 175, 0.2);
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
         }
 
-        .tab:hover:not(.active) {
-            background: #f1f5f9;
-            color: #334155;
+        .tab:hover {
+            background: #e9ecef;
         }
 
         .content {
-            min-height: 700px;
+            min-height: 600px;
             position: relative;
-            background: #fafafa;
         }
 
         .tab-content {
             display: none;
-            padding: 35px;
-            animation: fadeIn 0.6s ease;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
         }
 
         .tab-content.active {
@@ -121,260 +89,195 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Repository Structure Styles */
-        .repo-structure {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .learning-path {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #e2e8f0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .learning-path::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, #3b82f6, #8b5cf6, #ec4899);
-        }
-
-        .learning-path h3 {
-            color: #1e293b;
-            margin-bottom: 20px;
-            font-size: 1.4em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .project-item {
-            background: white;
-            border-radius: 10px;
-            padding: 18px;
-            margin: 12px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-left: 4px solid #3b82f6;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .project-item:hover {
-            transform: translateX(8px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-left-color: #8b5cf6;
-        }
-
-        .project-item h4 {
-            color: #1e293b;
-            margin-bottom: 8px;
-            font-size: 1.1em;
-        }
-
-        .project-item p {
-            color: #64748b;
-            font-size: 0.95em;
-            line-height: 1.5;
-        }
-
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .tech-tag {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            color: #1e40af;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-            border: 1px solid #bfdbfe;
-        }
-
-        /* Architecture Diagram */
+        /* Architecture Diagram Styles */
         .architecture {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            height: 500px;
         }
 
-        .arch-layer {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #e2e8f0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            min-height: 400px;
+        .layer {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            position: relative;
         }
 
-        .arch-layer h3 {
+        .layer h3 {
             text-align: center;
-            color: #1e293b;
-            margin-bottom: 25px;
+            color: #495057;
+            margin-bottom: 20px;
             font-size: 1.3em;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
         }
 
-        .arch-component {
+        .component {
             background: white;
-            border-radius: 12px;
-            padding: 18px;
-            margin: 15px 0;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-            border-left: 5px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .arch-component:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-            border-left-color: #8b5cf6;
+        .component:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
         }
 
-        .arch-component h4 {
-            color: #1e293b;
-            margin-bottom: 8px;
-            font-size: 1.05em;
+        .component h4 {
+            color: #495057;
+            margin-bottom: 5px;
         }
 
-        .arch-component p {
-            color: #64748b;
+        .component p {
+            color: #6c757d;
             font-size: 0.9em;
-            line-height: 1.4;
         }
 
-        /* Learning Journey */
-        .learning-journey {
+        /* Workflow Styles */
+        .workflow {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .journey-step {
+        .workflow-step {
             display: flex;
             align-items: center;
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border-left: 6px solid #10b981;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 6px solid #28a745;
             position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .journey-step:hover {
-            transform: translateX(10px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
         }
 
         .step-number {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: #28a745;
             color: white;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2em;
-            margin-right: 25px;
+            margin-right: 20px;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .step-content h4 {
-            color: #1e293b;
-            margin-bottom: 8px;
-            font-size: 1.2em;
+            color: #495057;
+            margin-bottom: 5px;
         }
 
         .step-content p {
-            color: #64748b;
-            line-height: 1.5;
+            color: #6c757d;
         }
 
-        .progress-arrow {
+        .arrow {
             position: absolute;
-            right: 25px;
-            color: #10b981;
-            font-size: 1.8em;
-            font-weight: bold;
+            right: 20px;
+            color: #28a745;
+            font-size: 1.5em;
         }
 
-        /* Infrastructure Overview */
+        /* Infrastructure Styles */
         .infrastructure {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
 
         .infra-component {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
-            border-radius: 15px;
-            padding: 25px;
+            border-radius: 10px;
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .infra-component::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="60" height="60" fill="url(%23dots)"/></svg>');
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
         .infra-component:hover {
-            transform: scale(1.05) rotate(1deg);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transform: scale(1.05);
         }
 
         .infra-component h4 {
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 10px;
+            font-size: 1.2em;
         }
 
         .infra-component p {
-            opacity: 0.95;
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
+            opacity: 0.9;
         }
+
+        /* Data Flow Styles */
+        .data-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .flow-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .flow-section h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .flow-section h4::before {
+            content: "🔄";
+            margin-right: 10px;
+        }
+
+        .flow-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .flow-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-green { background: #28a745; }
+        .status-blue { background: #007bff; }
+        .status-orange { background: #fd7e14; }
+        .status-purple { background: #6f42c1; }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .architecture, .repo-structure {
+            .architecture {
                 grid-template-columns: 1fr;
+                height: auto;
             }
 
             .tabs {
@@ -382,10 +285,10 @@
             }
 
             .header h1 {
-                font-size: 2.2em;
+                font-size: 2em;
             }
 
-            .journey-step {
+            .workflow-step {
                 flex-direction: column;
                 text-align: center;
             }
@@ -395,278 +298,131 @@
                 margin-right: 0;
             }
         }
-
-        .highlight-box {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 2px solid #f59e0b;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            color: #92400e;
-        }
-
-        .highlight-box h4 {
-            color: #92400e;
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-content">
-                <h1>🚀 GitOps Learning Repository</h1>
-                <p>Comprehensive DevOps Learning Journey with Hands-On Projects</p>
-                <p class="subtitle">From CI/CD Pipelines to Kubernetes Orchestration on Proxmox Infrastructure</p>
-            </div>
+            <h1>🚀 GitOps Architecture</h1>
+            <p>Complete CI/CD Pipeline with Flask, Jenkins, ArgoCD & Kubernetes</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="showTab('overview')">📚 Repository Overview</button>
-            <button class="tab" onclick="showTab('architecture')">🏗️ Architecture</button>
-            <button class="tab" onclick="showTab('journey')">🎯 Learning Journey</button>
-            <button class="tab" onclick="showTab('infrastructure')">⚙️ Infrastructure</button>
+            <button class="tab active" onclick="showTab('architecture')">Architecture</button>
+            <button class="tab" onclick="showTab('workflow')">Workflow</button>
+            <button class="tab" onclick="showTab('infrastructure')">Infrastructure</button>
+            <button class="tab" onclick="showTab('dataflow')">Data Flow</button>
         </div>
 
         <div class="content">
-            <!-- Repository Overview Tab -->
-            <div class="tab-content active" id="overview">
-                <div class="highlight-box">
-                    <h4>🎯 Your DevOps Learning Path</h4>
-                    <p>This repository serves as your comprehensive guide for mastering GitOps, CI/CD, and Kubernetes. Perfect for building hands-on experience with real-world DevOps scenarios on your Proxmox homelab.</p>
-                </div>
-
-                <div class="repo-structure">
-                    <div class="learning-path">
-                        <h3>🔧 CI/CD & Automation Projects</h3>
-                        <div class="project-item">
-                            <h4>Jenkins Pipeline Configurations</h4>
-                            <p>Comprehensive Jenkinsfiles for various application types including Docker builds, testing, and deployment automation</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">Jenkins</span>
-                                <span class="tech-tag">Docker</span>
-                                <span class="tech-tag">GitHub Webhooks</span>
-                            </div>
-                        </div>
-                        <div class="project-item">
-                            <h4>GitHub Actions Workflows</h4>
-                            <p>Modern CI/CD workflows for building, testing, and deploying applications with GitHub's native automation</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">GitHub Actions</span>
-                                <span class="tech-tag">YAML</span>
-                                <span class="tech-tag">Secrets Management</span>
-                            </div>
-                        </div>
-                        <div class="project-item">
-                            <h4>Python Automation Scripts</h4>
-                            <p>Essential Python scripts for DevOps tasks - perfect for improving your Python skills while learning automation</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">Python</span>
-                                <span class="tech-tag">APIs</span>
-                                <span class="tech-tag">Automation</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="learning-path">
-                        <h3>☸️ Kubernetes & GitOps</h3>
-                        <div class="project-item">
-                            <h4>ArgoCD Configurations</h4>
-                            <p>Production-ready ArgoCD setups for GitOps workflows, including app-of-apps patterns and multi-environment deployments</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">ArgoCD</span>
-                                <span class="tech-tag">GitOps</span>
-                                <span class="tech-tag">Helm</span>
-                            </div>
-                        </div>
-                        <div class="project-item">
-                            <h4>K3s Cluster Manifests</h4>
-                            <p>Kubernetes manifests optimized for your K3s setup on Proxmox, including storage, networking, and monitoring</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">K3s</span>
-                                <span class="tech-tag">YAML</span>
-                                <span class="tech-tag">MetalLB</span>
-                            </div>
-                        </div>
-                        <div class="project-item">
-                            <h4>Application Deployments</h4>
-                            <p>Real-world application examples with persistent storage, service meshes, and observability</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">Deployments</span>
-                                <span class="tech-tag">Services</span>
-                                <span class="tech-tag">Ingress</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="repo-structure">
-                    <div class="learning-path">
-                        <h3>🛠️ Infrastructure as Code</h3>
-                        <div class="project-item">
-                            <h4>Terraform Configurations</h4>
-                            <p>Infrastructure provisioning scripts for cloud and on-premises environments</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">Terraform</span>
-                                <span class="tech-tag">HCL</span>
-                                <span class="tech-tag">State Management</span>
-                            </div>
-                        </div>
-                        <div class="project-item">
-                            <h4>Ansible Playbooks</h4>
-                            <p>Configuration management and deployment automation for your Proxmox VMs</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">Ansible</span>
-                                <span class="tech-tag">YAML</span>
-                                <span class="tech-tag">Proxmox</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="learning-path">
-                        <h3>📊 Monitoring & Observability</h3>
-                        <div class="project-item">
-                            <h4>Prometheus & Grafana</h4>
-                            <p>Complete monitoring stack with custom dashboards and alerting rules</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">Prometheus</span>
-                                <span class="tech-tag">Grafana</span>
-                                <span class="tech-tag">AlertManager</span>
-                            </div>
-                        </div>
-                        <div class="project-item">
-                            <h4>Logging Solutions</h4>
-                            <p>Centralized logging with ELK stack or modern alternatives</p>
-                            <div class="tech-stack">
-                                <span class="tech-tag">ELK Stack</span>
-                                <span class="tech-tag">Fluentd</span>
-                                <span class="tech-tag">Loki</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Architecture Tab -->
-            <div class="tab-content" id="architecture">
+            <div class="tab-content active" id="architecture">
                 <div class="architecture">
-                    <div class="arch-layer">
-                        <h3>🔄 Source Control & CI</h3>
-                        <div class="arch-component">
+                    <div class="layer">
+                        <h3>🔧 Development & CI</h3>
+                        <div class="component" onclick="highlight(this)">
                             <h4>GitHub Repository</h4>
-                            <p>Central source of truth for all GitOps configurations, application code, and infrastructure definitions</p>
+                            <p>Source code, Dockerfile, Jenkinsfile, K8s manifests</p>
                         </div>
-                        <div class="arch-component">
-                            <h4>Jenkins CI Server</h4>
-                            <p>Automated build pipelines triggered by webhooks, handling testing, building, and pushing to registries</p>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>Jenkins CI Pipeline</h4>
+                            <p>Build, test, containerize, push to DockerHub</p>
                         </div>
-                        <div class="arch-component">
-                            <h4>Container Registry</h4>
-                            <p>DockerHub or private registry storing built application images with proper tagging strategies</p>
-                        </div>
-                        <div class="arch-component">
-                            <h4>Python Learning Scripts</h4>
-                            <p>Automation scripts to improve Python skills while solving real DevOps challenges</p>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>DockerHub Registry</h4>
+                            <p>Private container image repository</p>
                         </div>
                     </div>
 
-                    <div class="arch-layer">
-                        <h3>🚀 GitOps & Orchestration</h3>
-                        <div class="arch-component">
-                            <h4>ArgoCD Controller</h4>
-                            <p>GitOps operator monitoring Git repositories and automatically syncing changes to Kubernetes clusters</p>
+                    <div class="layer">
+                        <h3>🚀 GitOps & CD</h3>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>ArgoCD</h4>
+                            <p>GitOps operator, monitors Git for changes</p>
                         </div>
-                        <div class="arch-component">
-                            <h4>Kubernetes API Server</h4>
-                            <p>K3s control plane managing all cluster resources and orchestrating workloads</p>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>Kubernetes API</h4>
+                            <p>Deploys and manages application resources</p>
                         </div>
-                        <div class="arch-component">
-                            <h4>Helm Charts</h4>
-                            <p>Templated Kubernetes manifests for repeatable and configurable deployments</p>
-                        </div>
-                        <div class="arch-component">
-                            <h4>Configuration Repository</h4>
-                            <p>Separate Git repo containing all Kubernetes manifests and ArgoCD applications</p>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>Webhook Integration</h4>
+                            <p>GitHub → Jenkins automation</p>
                         </div>
                     </div>
 
-                    <div class="arch-layer">
-                        <h3>⚙️ Runtime & Infrastructure</h3>
-                        <div class="arch-component">
-                            <h4>Proxmox Hypervisor</h4>
-                            <p>Your homelab foundation hosting multiple VMs for K3s nodes and supporting services</p>
+                    <div class="layer">
+                        <h3>☸️ Runtime & Storage</h3>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>K3s Cluster</h4>
+                            <p>Lightweight Kubernetes on Proxmox</p>
                         </div>
-                        <div class="arch-component">
-                            <h4>K3s Cluster Nodes</h4>
-                            <p>Lightweight Kubernetes distribution perfect for learning and development environments</p>
+                        <div class="component" onclick="highlight(this)">
+                            <h4>MetalLB LoadBalancer</h4>
+                            <p>External access with IP 192.168.1.214</p>
                         </div>
-                        <div class="arch-component">
-                            <h4>MetalLB Load Balancer</h4>
-                            <p>Bare-metal load balancer providing external access to services in your homelab</p>
-                        </div>
-                        <div class="arch-component">
+                        <div class="component" onclick="highlight(this)">
                             <h4>Persistent Storage</h4>
-                            <p>Local storage solutions for stateful applications and data persistence</p>
+                            <p>Data persistence across deployments</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Learning Journey Tab -->
-            <div class="tab-content" id="journey">
-                <div class="learning-journey">
-                    <div class="journey-step">
+            <!-- Workflow Tab -->
+            <div class="tab-content" id="workflow">
+                <div class="workflow">
+                    <div class="workflow-step">
                         <div class="step-number">1</div>
                         <div class="step-content">
-                            <h4>Repository Setup & Understanding</h4>
-                            <p>Clone the repository, explore the structure, and understand how different components work together in your GitOps learning environment</p>
+                            <h4>Code Changes</h4>
+                            <p>Developer pushes code changes to GitHub repository</p>
                         </div>
-                        <div class="progress-arrow">→</div>
+                        <div class="arrow">→</div>
                     </div>
 
-                    <div class="journey-step">
+                    <div class="workflow-step">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <h4>Python Skills Development</h4>
-                            <p>Work through Python automation scripts, understanding how they integrate with DevOps workflows. Start with simple scripts and progress to complex automation</p>
+                            <h4>Webhook Trigger</h4>
+                            <p>GitHub webhook automatically triggers Jenkins pipeline</p>
                         </div>
-                        <div class="progress-arrow">→</div>
+                        <div class="arrow">→</div>
                     </div>
 
-                    <div class="journey-step">
+                    <div class="workflow-step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h4>CI/CD Pipeline Implementation</h4>
-                            <p>Set up Jenkins on your Proxmox infrastructure, configure webhooks, and implement automated build pipelines for various application types</p>
+                            <h4>CI Pipeline Execution</h4>
+                            <p>Jenkins builds Docker image and pushes to DockerHub with 'latest' tag</p>
                         </div>
-                        <div class="progress-arrow">→</div>
+                        <div class="arrow">→</div>
                     </div>
 
-                    <div class="journey-step">
+                    <div class="workflow-step">
                         <div class="step-number">4</div>
                         <div class="step-content">
-                            <h4>Kubernetes Cluster Preparation</h4>
-                            <p>Deploy and configure your K3s cluster on Proxmox VMs, set up networking with MetalLB, and prepare storage solutions</p>
+                            <h4>ArgoCD Detection</h4>
+                            <p>ArgoCD detects new image version and compares with Git manifests</p>
                         </div>
-                        <div class="progress-arrow">→</div>
+                        <div class="arrow">→</div>
                     </div>
 
-                    <div class="journey-step">
+                    <div class="workflow-step">
                         <div class="step-number">5</div>
                         <div class="step-content">
-                            <h4>GitOps with ArgoCD</h4>
-                            <p>Deploy ArgoCD to your cluster, configure GitOps workflows, and implement automated deployment patterns using the repository configurations</p>
+                            <h4>Automated Deployment</h4>
+                            <p>ArgoCD automatically syncs and deploys to Kubernetes cluster</p>
                         </div>
-                        <div class="progress-arrow">→</div>
+                        <div class="arrow">→</div>
                     </div>
 
-                    <div class="journey-step">
+                    <div class="workflow-step">
                         <div class="step-number">6</div>
                         <div class="step-content">
-                            <h4>Real-World Projects</h4>
-                            <p>Apply your learning by building complete end-to-end projects, from application development to production deployment using GitOps principles</p>
+                            <h4>Application Live</h4>
+                            <p>Flask application accessible via MetalLB LoadBalancer IP</p>
                         </div>
-                        <div class="progress-arrow">✅</div>
+                        <div class="arrow">✅</div>
                     </div>
                 </div>
             </div>
@@ -675,43 +431,108 @@
             <div class="tab-content" id="infrastructure">
                 <div class="infrastructure">
                     <div class="infra-component">
-                        <h4>🖥️ Proxmox Hypervisor</h4>
-                        <p>Your homelab foundation providing virtualization capabilities for hosting multiple K3s nodes and supporting infrastructure services</p>
+                        <h4>🖥️ Proxmox Server</h4>
+                        <p>Host virtualization platform running your K3s nodes and infrastructure VMs</p>
                     </div>
 
                     <div class="infra-component">
-                        <h4>☸️ K3s Kubernetes Cluster</h4>
-                        <p>Lightweight Kubernetes distribution running across multiple VMs, perfect for learning and development workloads</p>
+                        <h4>☸️ K3s Cluster</h4>
+                        <p>Lightweight Kubernetes distribution perfect for homelab setups</p>
                     </div>
 
                     <div class="infra-component">
-                        <h4>🔧 Jenkins CI/CD Server</h4>
-                        <p>Automation server running on dedicated VM, integrated with Docker and kubectl for complete pipeline automation</p>
+                        <h4>🔧 Jenkins Server</h4>
+                        <p>CI/CD automation server with Docker and kubectl access</p>
                     </div>
 
                     <div class="infra-component">
-                        <h4>🚀 ArgoCD GitOps Controller</h4>
-                        <p>GitOps operator deployed in Kubernetes, continuously monitoring Git repositories and syncing changes automatically</p>
+                        <h4>🚀 ArgoCD Server</h4>
+                        <p>GitOps continuous delivery tool for Kubernetes</p>
                     </div>
 
                     <div class="infra-component">
-                        <h4>⚖️ MetalLB Load Balancer</h4>
-                        <p>Bare-metal load balancer implementation providing external IP addresses for services in your homelab environment</p>
+                        <h4>⚖️ MetalLB</h4>
+                        <p>Load balancer implementation for bare metal Kubernetes clusters</p>
                     </div>
 
                     <div class="infra-component">
-                        <h4>📊 Monitoring Stack</h4>
-                        <p>Prometheus, Grafana, and AlertManager deployed for comprehensive observability of your entire infrastructure</p>
+                        <h4>💾 Persistent Storage</h4>
+                        <p>Host path storage at /home/k8server/YourAppData for data persistence</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Flow Tab -->
+            <div class="tab-content" id="dataflow">
+                <div class="data-flow">
+                    <div class="flow-section">
+                        <h4>Application Data Management</h4>
+                        <div class="flow-items">
+                            <div class="flow-item">
+                                <span class="status-indicator status-green"></span>
+                                <strong>users.json</strong><br>
+                                User accounts & authentication
+                            </div>
+                            <div class="flow-item">
+                                <span class="status-indicator status-blue"></span>
+                                <strong>questions.json</strong><br>
+                                Application questions data
+                            </div>
+                            <div class="flow-item">
+                                <span class="status-indicator status-orange"></span>
+                                <strong>flashcards.json</strong><br>
+                                Flashcard content
+                            </div>
+                            <div class="flow-item">
+                                <span class="status-indicator status-purple"></span>
+                                <strong>progress.json</strong><br>
+                                User progress tracking
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="infra-component">
-                        <h4>💾 Storage Solutions</h4>
-                        <p>Local path provisioner and NFS storage for persistent volumes, supporting stateful applications and data retention</p>
+                    <div class="flow-section">
+                        <h4>Data Persistence Strategy</h4>
+                        <div class="flow-items">
+                            <div class="flow-item">
+                                <strong>PersistentVolume</strong><br>
+                                5GB storage on host path
+                            </div>
+                            <div class="flow-item">
+                                <strong>Init Containers</strong><br>
+                                Copy default data if missing
+                            </div>
+                            <div class="flow-item">
+                                <strong>Volume Mounts</strong><br>
+                                Direct file mounting to /app/
+                            </div>
+                            <div class="flow-item">
+                                <strong>Data Protection</strong><br>
+                                Survives pod restarts/updates
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="infra-component">
-                        <h4>🐍 Python Development Environment</h4>
-                        <p>Dedicated environment for practicing Python automation scripts, integrated with your DevOps toolchain</p>
+                    <div class="flow-section">
+                        <h4>Deployment Data Flow</h4>
+                        <div class="flow-items">
+                            <div class="flow-item">
+                                <strong>1. Build Time</strong><br>
+                                Default JSON files in Docker image
+                            </div>
+                            <div class="flow-item">
+                                <strong>2. Init Phase</strong><br>
+                                Copy defaults to persistent storage
+                            </div>
+                            <div class="flow-item">
+                                <strong>3. Runtime</strong><br>
+                                Mount persistent files over defaults
+                            </div>
+                            <div class="flow-item">
+                                <strong>4. Updates</strong><br>
+                                User data preserved across deployments
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -737,43 +558,30 @@
 
         function highlight(element) {
             // Remove previous highlights
-            const components = document.querySelectorAll('.arch-component, .project-item');
-            components.forEach(comp => {
-                comp.style.borderLeft = comp.classList.contains('arch-component') ? '5px solid #3b82f6' : '4px solid #3b82f6';
-                comp.style.background = 'white';
-            });
+            const components = document.querySelectorAll('.component');
+            components.forEach(comp => comp.style.borderLeft = '4px solid #667eea');
 
             // Highlight clicked component
-            element.style.borderLeft = element.classList.contains('arch-component') ? '5px solid #10b981' : '4px solid #10b981';
-            element.style.background = '#f0fdf4';
+            element.style.borderLeft = '4px solid #28a745';
+            element.style.background = '#f8fff8';
 
-            // Reset after 3 seconds
+            // Reset after 2 seconds
             setTimeout(() => {
-                element.style.borderLeft = element.classList.contains('arch-component') ? '5px solid #3b82f6' : '4px solid #3b82f6';
+                element.style.borderLeft = '4px solid #667eea';
                 element.style.background = 'white';
-            }, 3000);
+            }, 2000);
         }
 
-        // Add interactivity to all clickable elements
+        // Add some interactivity
         document.addEventListener('DOMContentLoaded', function() {
-            const clickableElements = document.querySelectorAll('.arch-component, .project-item, .infra-component');
-            
-            clickableElements.forEach(element => {
-                element.addEventListener('click', function() {
-                    highlight(this);
-                });
-            });
-
-            // Add hover effects
-            const hoverElements = document.querySelectorAll('.project-item, .arch-component, .journey-step');
-            hoverElements.forEach(element => {
-                element.addEventListener('mouseenter', function() {
-                    this.style.transform = this.classList.contains('journey-step') ? 'translateX(10px)' : 
-                                          this.classList.contains('project-item') ? 'translateX(8px)' : 'translateY(-5px)';
+            const components = document.querySelectorAll('.component');
+            components.forEach(component => {
+                component.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
                 });
                 
-                element.addEventListener('mouseleave', function() {
-                    this.style.transform = 'none';
+                component.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
                 });
             });
         });
