@@ -2,9 +2,16 @@
 
 Welcome to the GitOps Learning Repository! This repository serves as a sandbox for learning and experimenting with GitOps practices using a variety of tools like Jenkins, ArgoCD, and more. Here, we aim to cover the essentials of GitOps, continuous integration (CI), and continuous deployment (CD) workflows by setting up sample pipelines and deployments.
 
+## 📊 Interactive Architecture Overview
+
+Explore the complete repository architecture and learning path with our interactive diagram:
+
+**[🚀 View GitOps Learning Repository Architecture](https://sohaib1khan.github.io/GitOps_Projects/)**
+
 ## Table of Contents
 
 - [GitOps Learning Repository](#gitops-learning-repository)
+  - [📊 Interactive Architecture Overview](#-interactive-architecture-overview)
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [What is GitOps?](#what-is-gitops)
